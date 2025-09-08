@@ -1,0 +1,47 @@
+# Arquivos de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+*.pkl
+
+# Ambiente virtual
+venv/
+.env/
+.venv/
+env/
+ENV/
+
+# Configurações de Flask
+instance/
+*.db
+*.sqlite3
+*.sqlite
+*.log
+
+# Arquivos de migração (Flask-Migrate / Alembic)
+migrations/versions/*.pyc
+migrations/*.pyc
+
+# Cache
+*.egg-info/
+.eggs/
+dist/
+build/
+*.manifest
+*.spec
+
+# Arquivos de IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Variáveis de ambiente
+*.env
+.env.*
