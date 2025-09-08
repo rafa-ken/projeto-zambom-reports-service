@@ -10,36 +10,36 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Configuração do MongoDB Atlas
-app.config["MONGO_URI"] = os.getenv("MONGO_URI")  # ex: .../ZAMBOM
+# Configuração do MongoDB Atlas (ou local)
+app.config["MONGO_URI"] = os.getenv("MONGO_URI", "mongodb://localhost:27017/reportsdb")
 mongo = PyMongo(app)
 
+# ---------------- ROTAS ---------------- #
 
-# GET - Listar anotações
-@app.route("/notes", methods=["GET"])
-def listar_notes():
-    notes = mongo.db.notes.find()
+# GET - Listar relatórios
+@app.route("/reports", methods=["GET"])
+def listar_reports():
+    reports = mongo.db.reports.find()
     saida = []
-    for note in notes:
+    for report in reports:
         saida.append({
-            "id": str(note["_id"]),
-            "titulo": note["titulo"],
-            "conteudo": note["conteudo"],
-            "criado_em": note.get("criado_em"),
-            "atualizado_em": note.get("atualizado_em")
+            "id": str(report["_id"]),
+            "titulo": report["titulo"],
+            "conteudo": report["conteudo"],
+            "criado_em": report.get("criado_em"),
+            "atualizado_em": report.get("atualizado_em")
         })
     return jsonify(saida), 200
 
-
-# POST - Criar anotação
-@app.route("/notes", methods=["POST"])
-def criar_note():
+# POST - Criar relatório
+@app.route("/reports", methods=["POST"])
+def criar_report():
     dados = request.json
     if not dados or "titulo" not in dados or "conteudo" not in dados:
         return jsonify({"erro": "Campos 'titulo' e 'conteudo' são obrigatórios"}), 400
 
     agora = datetime.utcnow()
-    note_id = mongo.db.notes.insert_one({
+    report_id = mongo.db.reports.insert_one({
         "titulo": dados["titulo"],
         "conteudo": dados["conteudo"],
         "criado_em": agora,
@@ -47,20 +47,19 @@ def criar_note():
     }).inserted_id
 
     return jsonify({
-        "id": str(note_id),
+        "id": str(report_id),
         "titulo": dados["titulo"],
         "conteudo": dados["conteudo"],
         "criado_em": agora.isoformat(),
         "atualizado_em": agora.isoformat()
     }), 201
 
-
-# PUT - Atualizar anotação
-@app.route("/notes/<id>", methods=["PUT"])
-def atualizar_note(id):
+# PUT - Atualizar relatório
+@app.route("/reports/<id>", methods=["PUT"])
+def atualizar_report(id):
     dados = request.json
     agora = datetime.utcnow()
-    atualizado = mongo.db.notes.find_one_and_update(
+    atualizado = mongo.db.reports.find_one_and_update(
         {"_id": ObjectId(id)},
         {"$set": {
             "titulo": dados.get("titulo"),
@@ -70,7 +69,7 @@ def atualizar_note(id):
         return_document=True
     )
     if not atualizado:
-        return jsonify({"erro": "Anotação não encontrada"}), 404
+        return jsonify({"erro": "Relatório não encontrado"}), 404
     return jsonify({
         "id": str(atualizado["_id"]),
         "titulo": atualizado["titulo"],
@@ -79,15 +78,15 @@ def atualizar_note(id):
         "atualizado_em": atualizado.get("atualizado_em")
     }), 200
 
-
-# DELETE - Remover anotação
-@app.route("/notes/<id>", methods=["DELETE"])
-def deletar_note(id):
-    resultado = mongo.db.notes.delete_one({"_id": ObjectId(id)})
+# DELETE - Remover relatório
+@app.route("/reports/<id>", methods=["DELETE"])
+def deletar_report(id):
+    resultado = mongo.db.reports.delete_one({"_id": ObjectId(id)})
     if resultado.deleted_count == 0:
-        return jsonify({"erro": "Anotação não encontrada"}), 404
-    return jsonify({"mensagem": "Anotação deletada com sucesso"}), 200
+        return jsonify({"erro": "Relatório não encontrado"}), 404
+    return jsonify({"mensagem": "Relatório deletado com sucesso"}), 200
 
+# --------------------------------------- #
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5002, debug=True)
