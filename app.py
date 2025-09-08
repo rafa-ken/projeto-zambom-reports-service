@@ -11,7 +11,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Configuração do MongoDB Atlas (ou local)
-app.config["MONGO_URI"] = os.getenv("MONGO_URI", "mongodb://localhost:27017/reportsdb")
+app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 mongo = PyMongo(app)
 
 # ---------------- ROTAS ---------------- #
@@ -89,4 +89,4 @@ def deletar_report(id):
 # --------------------------------------- #
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5002, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)
