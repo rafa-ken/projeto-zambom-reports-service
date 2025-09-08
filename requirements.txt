@@ -4,12 +4,13 @@ Flask==3.0.3
 # Banco de dados (MongoDB)
 pymongo==4.10.1
 flask-pymongo==2.3.0
+mongomock==4.1.2   # Mock para testes sem precisar de Mongo real
 
 # Testes
 pytest==8.3.2
 pytest-cov==5.0.0
 
-# Utilitários (para APIs externas, etc.)
+# Utilitários
 requests==2.32.3
-
-dotenv
+python-dotenv==1.0.1
+python-jose==3.3.0   # Para trabalhar com tokens JWT (Auth0)
