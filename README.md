@@ -24,7 +24,7 @@ python app.py
 ## Como rodar com Docker
 ```bash
 docker build -t your-dockerhub-username/reports-service .
-docker run -p 5003:5000 your-dockerhub-username/reports-service
+docker run -p 8081:5001 your-dockerhub-username/reports-service
 ```
 
 ## Testes
