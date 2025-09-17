@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - Notes Service
+name: CI/CD Pipeline - Reports Service
 
 on:
   push:
@@ -37,8 +37,8 @@ jobs:
 
       - name: Build e Push da imagem
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/notes-service:latest .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/notes-service:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest
 
       - name: Configurar SSH para EC2
         uses: webfactory/ssh-agent@v0.7.0
@@ -48,11 +48,12 @@ jobs:
       - name: Deploy na EC2
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/notes-service:latest
-          docker stop notes-service || true
-          docker rm notes-service || true
-          docker run -d -p 8081:5001 \
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest
+          docker stop reports-service || true
+          docker rm reports-service || true
+          docker run -d \
+            -p 8081:5001 \
             -e MONGO_URI=${{ secrets.MONGO_URI }} \
-            --name notes-service \
-            ${{ secrets.DOCKERHUB_USERNAME }}/notes-service:latest
+            --name reports-service \
+            ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest
           EOF
