@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - Reports Service
+name: CI/CD Pipeline - Notes Service
 
 on:
   push:
@@ -51,8 +51,7 @@ jobs:
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest
           docker stop reports-service || true
           docker rm reports-service || true
-          docker run -d \
-            -p 8081:5001 \
+          docker run -d -p 8081:5001 \
             -e MONGO_URI=${{ secrets.MONGO_URI }} \
             --name reports-service \
             ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest
