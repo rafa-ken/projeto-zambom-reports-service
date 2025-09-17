@@ -1,20 +1,27 @@
-# Usa uma imagem base leve do Python
+# Etapa de execução
 FROM python:3.11-slim
 
-# Define diretório de trabalho dentro do container
+
+# Definir diretório de trabalho
 WORKDIR /app
 
-# Copia dependências para instalar
-COPY requirements.txt .
 
-# Instala dependências
+# Instalar dependências do sistema necessárias para mysqlclient
+RUN apt-get update && apt-get install -y \
+    default-libmysqlclient-dev \
+    build-essential \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copiar arquivos do projeto
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia o restante do código da aplicação
+
 COPY . .
 
-# Expõe a porta usada pelo Flask
-EXPOSE 5001
+# Expor a porta do Flask
+EXPOSE 5002
 
-# Comando para iniciar a aplicação
-CMD ["python", "app.py"]
+# Rodar o Flask com Gunicorn
+CMD ["gunicorn", "-b", "0.0.0.0:5002", "app:app"]

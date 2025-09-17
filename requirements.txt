@@ -2,3 +2,6 @@ flask
 flask-pymongo
 python-dotenv
 pymongo
+mongomock
+pytest
+gunicorn
