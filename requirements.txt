@@ -5,3 +5,4 @@ pymongo
 mongomock
 pytest
 gunicorn
+flask_cors
