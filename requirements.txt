@@ -7,3 +7,5 @@ pytest
 gunicorn
 flask_cors
 requests
+jose
+python-jose
