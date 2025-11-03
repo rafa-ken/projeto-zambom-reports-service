@@ -6,3 +6,4 @@ mongomock
 pytest
 gunicorn
 flask_cors
+requests
