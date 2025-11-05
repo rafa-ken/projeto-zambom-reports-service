@@ -45,12 +45,13 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Deploy na EC2
+      - name: Deploy na EC2 (versão simples)
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest
           docker stop reports-service || true
           docker rm reports-service || true
+
           docker run -d \
             -p 8081:5001 \
             -e MONGO_URI="${{ secrets.MONGO_URI }}" \
@@ -58,7 +59,7 @@ jobs:
             -e API_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
             -e AUTH0_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
             -e FRONTEND_ORIGINS="${{ secrets.FRONTEND_ORIGINS }}" \
-            -e TASKS_SERVICE_URL="http://localhost:8080" \
+            -e TASKS_SERVICE_URL="http://54.233.188.129:8080/tarefas" \
             -e PORT=5001 \
             -e FLASK_ENV=production \
             --name reports-service \
