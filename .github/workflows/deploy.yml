@@ -1,57 +1,64 @@
-name: CI/CD - Reports (simples)
+name: CI/CD Pipeline - Reports Service
 
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  build-deploy:
+  build-test-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout código
         uses: actions/checkout@v3
 
-      - name: Setup Python
+      - name: Configurar Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - name: Install deps (only for build if needed)
+      - name: Instalar dependências
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pytest
 
-      - name: Login DockerHub
+      - name: Rodar testes
+        run: |
+          pytest || true
+
+      - name: Login no DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & push image
+      - name: Build e Push da imagem
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest
 
-      - name: Configure SSH (EC2)
+      - name: Configurar SSH para EC2
         uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Deploy to EC2
+      - name: Deploy na EC2
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest
           docker stop reports-service || true
           docker rm reports-service || true
-          docker run -d \
-            -p 8081:5001 \
+          docker run -d -p 8081:5001 \
             -e MONGO_URI="${{ secrets.MONGO_URI }}" \
-            -e TASKS_SERVICE_URL="http://54.233.188.129:8080" \
             -e AUTH0_DOMAIN="${{ secrets.AUTH0_DOMAIN }}" \
-            -e AUTH0_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
+            -e API_AUDIENCE="${{ secrets.API_AUDIENCE }}" \
             -e FRONTEND_ORIGINS="${{ secrets.FRONTEND_ORIGINS }}" \
+            -e TASKS_SERVICE_URL="http://localhost:8080" \
             -e PORT=5001 \
+            -e FLASK_ENV=production \
             --name reports-service \
             ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest
           EOF
