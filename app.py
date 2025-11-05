@@ -195,7 +195,13 @@ def validate_task_id_hybrid(task_id):
 
     # 2) fallback sync para tasks-service
     try:
-        r = _http_session.get(f"{TASKS_SERVICE_URL}/tarefas/{task_id}", timeout=0.8)
+        # Passar o token de autenticação do request atual
+        headers = {}
+        auth_header = request.headers.get("Authorization")
+        if auth_header:
+            headers["Authorization"] = auth_header
+        
+        r = _http_session.get(f"{TASKS_SERVICE_URL}/tarefas/{task_id}", headers=headers, timeout=0.8)
         if r.status_code == 200:
             task = r.json()
             # salvar snapshot local (usando _id como ObjectId)
