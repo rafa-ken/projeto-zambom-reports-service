@@ -54,7 +54,8 @@ jobs:
           docker run -d -p 8081:5001 \
             -e MONGO_URI="${{ secrets.MONGO_URI }}" \
             -e AUTH0_DOMAIN="${{ secrets.AUTH0_DOMAIN }}" \
-            -e API_AUDIENCE="${{ secrets.API_AUDIENCE }}" \
+            -e API_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
+            -e AUTH0_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
             -e FRONTEND_ORIGINS="${{ secrets.FRONTEND_ORIGINS }}" \
             -e TASKS_SERVICE_URL="http://localhost:8080" \
             -e PORT=5001 \
