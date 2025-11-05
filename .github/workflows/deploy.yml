@@ -52,12 +52,13 @@ jobs:
           docker stop reports-service || true
           docker rm reports-service || true
           docker run -d -p 8081:5001 \
+            --add-host=host.docker.internal:host-gateway \
             -e MONGO_URI="${{ secrets.MONGO_URI }}" \
             -e AUTH0_DOMAIN="${{ secrets.AUTH0_DOMAIN }}" \
             -e API_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
             -e AUTH0_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
             -e FRONTEND_ORIGINS="${{ secrets.FRONTEND_ORIGINS }}" \
-            -e TASKS_SERVICE_URL="http://localhost:8080" \
+            -e TASKS_SERVICE_URL="http://host.docker.internal:8080" \
             -e PORT=5001 \
             -e FLASK_ENV=production \
             --name reports-service \
