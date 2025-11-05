@@ -51,8 +51,13 @@ jobs:
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest
           docker stop reports-service || true
           docker rm reports-service || true
-          docker run -d -p 8081:5001 \
+          docker run -d -p 8081:5000 \
             -e MONGO_URI=${{ secrets.MONGO_URI }} \
+            -e AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }} \
+            -e AUTH0_AUDIENCE=${{ secrets.AUTH0_AUDIENCE }} \
+            -e FRONTEND_ORIGINS=${{ secrets.FRONTEND_ORIGINS }} \
+            -e PORT=5000 \
+            -e FLASK_ENV=production \
             --name reports-service \
             ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest
           EOF

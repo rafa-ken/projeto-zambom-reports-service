@@ -5,7 +5,8 @@ pymongo
 mongomock
 pytest
 gunicorn
-flask_cors
-requests
-jose
+
+# extras para Auth0 / JWT validation and CORS
 python-jose
+requests
+flask-cors
