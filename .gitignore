@@ -43,7 +43,6 @@ build/
 Thumbs.db
 
 # Variáveis de ambiente
-*.env
-.env.*
-
 .env
+.env.local
+.env.*.local
