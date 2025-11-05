@@ -52,7 +52,7 @@ jobs:
           docker stop reports-service || true
           docker rm reports-service || true
           docker run -d \
-            --network host \
+            -p 8081:5001 \
             -e MONGO_URI="${{ secrets.MONGO_URI }}" \
             -e AUTH0_DOMAIN="${{ secrets.AUTH0_DOMAIN }}" \
             -e API_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
