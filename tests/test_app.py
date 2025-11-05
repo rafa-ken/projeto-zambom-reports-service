@@ -46,4 +46,4 @@ def test_deletar_report(client):
 
     delete_res = client.delete(f"/reports/{report_id}")
     assert delete_res.status_code == 200
-    assert delete_res.json["mensagem"] == "Relatório deletado com sucesso"
+    assert delete_res.json["message"] == "Relatório deletado com sucesso"
