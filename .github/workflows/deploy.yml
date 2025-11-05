@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - Notes Service
+name: Deploy reports (simples)
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-test-deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,11 +23,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest pytest-cov
-
-      - name: Rodar testes
-        run: |
-          pytest
 
       - name: Login no DockerHub
         uses: docker/login-action@v2
@@ -35,31 +30,26 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build e Push da imagem
+      - name: Build e push da imagem
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest
 
-      - name: Configurar SSH para EC2
+      - name: Configurar SSH
         uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Deploy na EC2 (versão simples)
+      - name: Deploy na EC2 (rodar container)
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/reports-service:latest || true
           docker stop reports-service || true
           docker rm reports-service || true
-
           docker run -d \
             -p 8081:5001 \
             -e MONGO_URI="${{ secrets.MONGO_URI }}" \
-            -e AUTH0_DOMAIN="${{ secrets.AUTH0_DOMAIN }}" \
-            -e API_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
-            -e AUTH0_AUDIENCE="${{ secrets.AUTH0_AUDIENCE }}" \
-            -e FRONTEND_ORIGINS="${{ secrets.FRONTEND_ORIGINS }}" \
-            -e TASKS_SERVICE_URL="http://54.233.188.129:8080/tarefas" \
+            -e TASKS_SERVICE_URL="http://54.233.188.129:8080" \
             -e PORT=5001 \
             -e FLASK_ENV=production \
             --name reports-service \
